@@ -13,7 +13,7 @@ You can add tasks, assign priority & due date, mark tasks as done ✅, and remov
 
 Try the app here:  
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://your-app-name.streamlit.app/)  
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://codingrajatechnologiesinternship2-pf7jjkqrphdvmrzv3kzwqc.streamlit.app/)  
 
 ---
 
