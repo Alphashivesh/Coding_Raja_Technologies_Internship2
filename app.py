@@ -125,7 +125,7 @@ if not tasks.empty:
         if cols[1].button("✔️", key=f"done_{i}"):
             st.session_state["tasks"][i]["done"] = True
             save_tasks(st.session_state["tasks"])
-            st.experimental_rerun()
+            st.rerun()
 
         if cols[2].button("✏️", key=f"edit_{i}"):
             with st.expander(f"Edit: {row['task']}"):
@@ -142,11 +142,11 @@ if not tasks.empty:
                         "done": row["done"]
                     }
                     save_tasks(st.session_state["tasks"])
-                    st.experimental_rerun()
+                    st.rerun()
 
         if cols[3].button("🗑", key=f"remove_{i}"):
             st.session_state["tasks"].pop(i)
             save_tasks(st.session_state["tasks"])
-            st.experimental_rerun()
+            st.rerun()
 else:
     st.info("No tasks yet. Add some above ⬆️")
