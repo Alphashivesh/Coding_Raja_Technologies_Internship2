@@ -5,7 +5,6 @@ import os
 import matplotlib.pyplot as plt
 from datetime import date
 
-
 # --- File persistence ---
 DATA_FILE = "tasks.json"
 
@@ -22,15 +21,17 @@ def save_tasks(tasks):
 # --- Session State ---
 if "tasks" not in st.session_state:
     st.session_state["tasks"] = load_tasks()
-if "theme" not in st.session_state:
-    st.session_state["theme"] = "Light" 
 
-
+# --- Page Config ---
 st.set_page_config(page_title="To-Do List App", page_icon="📝", layout="centered")
 
+# --- Sidebar: Filters & Theme ---
+st.sidebar.header("⚙️ Settings")
+theme_choice = st.sidebar.radio("🌙 Theme", ["Light", "Dark"], index=0)
+
 # --- Dark/Light Mode CSS ---
-def set_theme(dark: bool):
-    if dark:
+def apply_theme(choice):
+    if choice == "Dark":
         st.markdown(
             """
             <style>
@@ -59,40 +60,7 @@ def set_theme(dark: bool):
             unsafe_allow_html=True,
         )
 
-# --- Sidebar: Filters & Theme ---
-st.sidebar.header("⚙️ Settings")
-st.session_state["theme"] = st.sidebar.radio("🌙 Theme", ["Light", "Dark"], index=0)
-
-# Apply CSS based on theme
-if st.session_state["theme"] == "Dark":
-    st.markdown(
-        """
-        <style>
-        body { background-color: #121212; color: white; }
-        .stTextInput>div>div>input, .stSelectbox>div>div>select {
-            background-color: #1e1e1e !important;
-            color: white !important;
-        }
-        .stButton>button { background-color: #333; color: white; }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-else:
-    st.markdown(
-        """
-        <style>
-        body { background-color: white; color: black; }
-        .stTextInput>div>div>input, .stSelectbox>div>div>select {
-            background-color: white !important;
-            color: black !important;
-        }
-        .stButton>button { background-color: #eee; color: black; }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
-
+apply_theme(theme_choice)
 
 st.sidebar.subheader("🔍 Filters")
 filter_category = st.sidebar.multiselect("Filter by Category", ["Work", "Personal", "Shopping", "Other"])
@@ -100,44 +68,11 @@ filter_priority = st.sidebar.multiselect("Filter by Priority", ["Low", "Medium",
 show_completed = st.sidebar.checkbox("Show Completed Tasks", value=True)
 search_text = st.sidebar.text_input("Search Task")
 
-
-# --- Dashboard & Charts ---
-st.subheader("📊 Task Analytics")
-
-if not tasks.empty:
-    # --- Pie Chart: Tasks by Category ---
-    cat_counts = tasks["category"].value_counts()
-    fig1, ax1 = plt.subplots()
-    ax1.pie(cat_counts, labels=cat_counts.index, autopct="%1.1f%%", startangle=90)
-    ax1.set_title("Tasks by Category")
-    st.pyplot(fig1)
-
-    # --- Bar Chart: Tasks by Priority ---
-    pri_counts = tasks["priority"].value_counts()
-    fig2, ax2 = plt.subplots()
-    ax2.bar(pri_counts.index, pri_counts.values, color=["green", "orange", "red"])
-    ax2.set_ylabel("Number of Tasks")
-    ax2.set_title("Tasks by Priority")
-    st.pyplot(fig2)
-
-    # --- Weekly Completion Trend ---
-    tasks["due_date"] = pd.to_datetime(tasks["due_date"])
-    weekly = tasks[tasks["done"] == True].groupby(tasks["due_date"].dt.isocalendar().week).size()
-
-    if not weekly.empty:
-        fig3, ax3 = plt.subplots()
-        weekly.plot(kind="line", marker="o", ax=ax3)
-        ax3.set_xlabel("Week Number")
-        ax3.set_ylabel("Completed Tasks")
-        ax3.set_title("Weekly Completion Trend")
-        st.pyplot(fig3)
-
-
 st.sidebar.subheader("🎨 Personalization")
 accent_color = st.sidebar.color_picker("Choose Accent Color", "#4CAF50")
 font_size = st.sidebar.slider("Font Size", 12, 24, 16)
 
-# Apply CSS
+# Apply custom CSS
 custom_css = f"""
 <style>
 body {{
@@ -153,8 +88,6 @@ body {{
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
-
-
 
 # --- Main Title ---
 st.title("📝 To-Do List App")
@@ -239,3 +172,32 @@ if not tasks.empty:
             st.rerun()
 else:
     st.info("No tasks yet. Add some above ⬆️")
+
+# --- Dashboard & Charts ---
+st.subheader("📊 Task Analytics")
+if not tasks.empty:
+    # Pie Chart: Tasks by Category
+    cat_counts = tasks["category"].value_counts()
+    fig1, ax1 = plt.subplots()
+    ax1.pie(cat_counts, labels=cat_counts.index, autopct="%1.1f%%", startangle=90)
+    ax1.set_title("Tasks by Category")
+    st.pyplot(fig1)
+
+    # Bar Chart: Tasks by Priority
+    pri_counts = tasks["priority"].value_counts()
+    fig2, ax2 = plt.subplots()
+    ax2.bar(pri_counts.index, pri_counts.values, color=["green", "orange", "red"])
+    ax2.set_ylabel("Number of Tasks")
+    ax2.set_title("Tasks by Priority")
+    st.pyplot(fig2)
+
+    # Weekly Completion Trend
+    tasks["due_date"] = pd.to_datetime(tasks["due_date"])
+    weekly = tasks[tasks["done"] == True].groupby(tasks["due_date"].dt.isocalendar().week).size()
+    if not weekly.empty:
+        fig3, ax3 = plt.subplots()
+        weekly.plot(kind="line", marker="o", ax=ax3)
+        ax3.set_xlabel("Week Number")
+        ax3.set_ylabel("Completed Tasks")
+        ax3.set_title("Weekly Completion Trend")
+        st.pyplot(fig3)
