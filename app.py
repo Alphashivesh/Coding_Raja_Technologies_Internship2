@@ -5,6 +5,7 @@ import os
 import matplotlib.pyplot as plt
 from datetime import date
 
+
 # --- File persistence ---
 DATA_FILE = "tasks.json"
 
